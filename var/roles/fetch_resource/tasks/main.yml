@@ -1,0 +1,7 @@
+---
+tasks:
+  - name: Fetch the /var/log/secure log file from managed hosts
+    fetch:
+      src: "{{ src_path }}"
+      dest: "{{ dst_path }}"
+      flat: no
