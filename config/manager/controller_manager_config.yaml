@@ -8,4 +8,4 @@ webhook:
   port: 9443
 leaderElection:
   leaderElect: true
-  resourceName: 337bdc4f.github.com
+  resourceName: da6f2bf4.github.com
