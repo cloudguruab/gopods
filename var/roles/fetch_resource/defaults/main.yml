@@ -1,3 +1,0 @@
----
-src_log: /var/log/secure
-dst_log: secure-backups

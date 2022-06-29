@@ -1,0 +1,20 @@
+# permissions for end users to view formats.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: format-viewer-role
+rules:
+- apiGroups:
+  - manila.example.com
+  resources:
+  - formats
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - manila.example.com
+  resources:
+  - formats/status
+  verbs:
+  - get

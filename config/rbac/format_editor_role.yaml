@@ -1,0 +1,24 @@
+# permissions for end users to edit formats.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: format-editor-role
+rules:
+- apiGroups:
+  - manila.example.com
+  resources:
+  - formats
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - manila.example.com
+  resources:
+  - formats/status
+  verbs:
+  - get

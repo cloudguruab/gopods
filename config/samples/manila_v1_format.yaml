@@ -1,0 +1,6 @@
+apiVersion: manila.example.com/v1
+kind: Format
+metadata:
+  name: format-sample
+spec:
+  # TODO(user): Add fields here
