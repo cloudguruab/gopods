@@ -56,13 +56,13 @@ type FormatSpec struct {
 	// Valid state:
 	// - Available
 	// - Creating 
-	ShareState {}interface `json:"shareState,omitempty"`
+	ShareState interface{} `json:"shareState,omitempty"`
 }
 
 // FormatStatus defines the observed state of Format
 type FormatStatus struct {
 
-	// List of live share types
+	// List of live share types - FIXME: manilav1 undefined
 	Ok []manilav1.ObjectReference `json:"ok,omitempty"`
 
 	// Most recently fetched state
