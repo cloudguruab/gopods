@@ -20,22 +20,53 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
+
+type SharePolicy string
+
+const (
+	// Stale state triggers replacing exisitng share type
+	// by simple removal and creation
+	Stale SharePolicy = "Replace"
+
+	// Ok state allows existing share types to remain operational
+	Ok SharePolicy = "Allow"
+)
 
 // FormatSpec defines the desired state of Format
 type FormatSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
 
-	// Foo is an example field of Format. Edit format_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	// Share Type Instance
+	Share string `json:"share"`
+
+	// Timestamp in seconds for share types initialized
+	CreationTimeSeconds *int64 `json:"creationTimeSeconds"`
+
+	// Policy for handling stale share types
+	SharePolicy SharePolicy `json:"sharePolicy,omitempty"`
+
+	// This flag determines if controller needs to handle stale shares
+	// Usecase: if we extend this to handle migration of shares on a 
+	// volume then we'd want to migrate items older than certain timestmap.
+	Suspend *bool `json:"suspend,omitempty"`
+
+	// List of existing shares on cluster
+	ExistingShares []string `json:"existingShares"`
+
+	// State of existing shares
+	// Valid state:
+	// - Available
+	// - Creating 
+	ShareState {}interface `json:"shareState,omitempty"`
 }
 
 // FormatStatus defines the observed state of Format
 type FormatStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+
+	// List of live share types
+	Ok []manilav1.ObjectReference `json:"ok,omitempty"`
+
+	// Most recently fetched state
+	RecentShareState *metav1.Time `json:"recentShareState,omitempty"`
 }
 
 //+kubebuilder:object:root=true
