@@ -18,6 +18,7 @@ package v1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	corev1 "k8s.io/api/core/v1"
 )
 
 
@@ -56,14 +57,14 @@ type FormatSpec struct {
 	// Valid state:
 	// - Available
 	// - Creating 
-	ShareState interface{} `json:"shareState,omitempty"`
+	ShareState []string `json:"shareState,omitempty"`
 }
 
 // FormatStatus defines the observed state of Format
 type FormatStatus struct {
 
 	// List of live share types - FIXME: manilav1 undefined
-	Ok []manilav1.ObjectReference `json:"ok,omitempty"`
+	Ok []corev1.ObjectReference `json:"ok,omitempty"`
 
 	// Most recently fetched state
 	RecentShareState *metav1.Time `json:"recentShareState,omitempty"`
