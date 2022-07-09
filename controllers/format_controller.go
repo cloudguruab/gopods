@@ -18,38 +18,59 @@ package controllers
 
 import (
 	"context"
+	"fmt"
+	"time"
+	"sort"
 
+	osp "github.com/gophercloud/gophercloud"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
+	corev1 "k8s.io/api/core/v1"
 
 	manilav1 "github.com/cloudguruab/gopods/api/v1"
 )
+
+type realClock struct{}
+
+func (_ realClock) Now() time.Time { return time.Now() }
+
+// clock knows how to get the current time.
+// It can be used to fake out timing for testing.
+type Clock interface {
+    Now() time.Time
+}
 
 // FormatReconciler reconciles a Format object
 type FormatReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
+	Clock
 }
 
 //+kubebuilder:rbac:groups=manila.example.com,resources=formats,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=manila.example.com,resources=formats/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=manila.example.com,resources=formats/finalizers,verbs=update
-
-// Reconcile is part of the main kubernetes reconciliation loop which aims to
-// move the current state of the cluster closer to the desired state.
-// TODO(user): Modify the Reconcile function to compare the state specified by
-// the Format object against the actual cluster state, and then
-// perform operations to make the cluster state reflect the state specified by
-// the user.
-//
-// For more details, check Reconcile and its Result here:
-// - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.12.1/pkg/reconcile
+//+kubebuilder:rbac:groups=manila,resources=jobs,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=manila,resources=jobs/status,verbs=get
 func (r *FormatReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	_ = log.FromContext(ctx)
 
-	// TODO(user): your logic here
+	var format manilav1.Format
+	if err := r.Get(ctx, req.NamespacedName, &format); err != nil {
+		log.Error(err, "unable to fetch formatted Share")
+		// we'll ignore not-found errors, since they can't be fixed by an immediate
+		// requeue (we'll need to wait for a new notification), and we can get them
+		// on deleted requests.
+		return ctrl.Result{}, client.IgnoreNotFound(err)
+	}
+
+	var shares osp.ListShares
+	if err := r.List(ctx, &shares, client.InNamespace(req.Namespace), client.MatchingFields{jobOwnerKey: req.Name}); err != nil {
+		log.Error(err, "unable to list Shares")
+		return ctrl.Result{}, err
+	}
 
 	return ctrl.Result{}, nil
 }
